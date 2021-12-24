@@ -59,9 +59,9 @@ class VideoPlayerValue {
   /// Returns an instance with the given [errorDescription].
   VideoPlayerValue.erroneous(String errorDescription)
       : this(
-      duration: Duration.zero,
-      isInitialized: false,
-      errorDescription: errorDescription);
+            duration: Duration.zero,
+            isInitialized: false,
+            errorDescription: errorDescription);
 
   /// The total duration of the video.
   ///
@@ -206,7 +206,8 @@ class VideoPlayerController extends ValueNotifier<VideoPlayerValue> {
   /// null. The [package] argument must be non-null when the asset comes from a
   /// package and null otherwise.
 
-  void Function(VideoPlayerError videoErrorListener)? _videoErrorListener;
+  VideoErrorCallback? _videoErrorListener;
+  bool _logVideoState = false;
 
   VideoPlayerController.asset(this.dataSource,
       {this.package, this.closedCaptionFile, this.videoPlayerOptions})
@@ -226,12 +227,12 @@ class VideoPlayerController extends ValueNotifier<VideoPlayerValue> {
   /// for the request to the [dataSource].
 
   VideoPlayerController.network(
-      this.dataSource, {
-        this.formatHint,
-        this.closedCaptionFile,
-        this.videoPlayerOptions,
-        this.httpHeaders = const {},
-      })  : dataSourceType = DataSourceType.network,
+    this.dataSource, {
+    this.formatHint,
+    this.closedCaptionFile,
+    this.videoPlayerOptions,
+    this.httpHeaders = const {},
+  })  : dataSourceType = DataSourceType.network,
         package = null,
         super(VideoPlayerValue(duration: Duration.zero));
 
@@ -257,7 +258,7 @@ class VideoPlayerController extends ValueNotifier<VideoPlayerValue> {
   VideoPlayerController.contentUri(Uri contentUri,
       {this.closedCaptionFile, this.videoPlayerOptions})
       : assert(defaultTargetPlatform == TargetPlatform.android,
-  'VideoPlayerController.contentUri is only supported on Android.'),
+            'VideoPlayerController.contentUri is only supported on Android.'),
         dataSource = contentUri.toString(),
         dataSourceType = DataSourceType.contentUri,
         package = null,
@@ -360,7 +361,7 @@ class VideoPlayerController extends ValueNotifier<VideoPlayerValue> {
     final Completer<void> initializingCompleter = Completer<void>();
 
     void _videoErrorhandler(VideoEvent event) {
-      if (this._videoErrorListener != null) {
+      if (_videoErrorListener != null) {
         if (event.eventType != VideoEventType.error) {
           return;
         }
@@ -373,7 +374,7 @@ class VideoPlayerController extends ValueNotifier<VideoPlayerValue> {
           errorTypes = VideoErrorTypes.MEDIA_CODEC_ERROR;
         }
 
-        this._videoErrorListener!(VideoPlayerError(
+        _videoErrorListener!(VideoPlayerError(
           errorType: errorTypes,
           errorDetail: event.errorDetail ?? "",
         ));
@@ -384,7 +385,9 @@ class VideoPlayerController extends ValueNotifier<VideoPlayerValue> {
       if (_isDisposed) {
         return;
       }
-      print("receiveBroadcastStream-VideoPlayer->${event.eventType.name}");
+      if (_logVideoState && kDebugMode) {
+        debugPrint("yc_player_state->${event.eventType.name}");
+      }
 
       switch (event.eventType) {
         case VideoEventType.initialized:
@@ -399,10 +402,10 @@ class VideoPlayerController extends ValueNotifier<VideoPlayerValue> {
           _applyPlayPause();
           break;
         case VideoEventType.completed:
-        // In this case we need to stop _timer, set isPlaying=false, and
-        // position=value.duration. Instead of setting the values directly,
-        // we use pause() and seekTo() to ensure the platform stops playing
-        // and seeks to the last frame of the video.
+          // In this case we need to stop _timer, set isPlaying=false, and
+          // position=value.duration. Instead of setting the values directly,
+          // we use pause() and seekTo() to ensure the platform stops playing
+          // and seeks to the last frame of the video.
           pause().then((void pauseResult) => seekTo(value.duration));
           break;
         case VideoEventType.bufferingUpdate:
@@ -423,9 +426,7 @@ class VideoPlayerController extends ValueNotifier<VideoPlayerValue> {
     }
 
     if (closedCaptionFile != null) {
-      if (_closedCaptionFile == null) {
-        _closedCaptionFile = await closedCaptionFile;
-      }
+      _closedCaptionFile ??= await closedCaptionFile;
       value = value.copyWith(caption: _getCaptionAt(value.position));
     }
 
@@ -468,6 +469,8 @@ class VideoPlayerController extends ValueNotifier<VideoPlayerValue> {
   /// This method returns a future that completes as soon as the "play" command
   /// has been sent to the platform, not when playback itself is totally
   /// finished.
+  ///
+  ///
   Future<void> play() async {
     if (value.position == value.duration) {
       await seekTo(const Duration());
@@ -507,7 +510,7 @@ class VideoPlayerController extends ValueNotifier<VideoPlayerValue> {
       _timer?.cancel();
       _timer = Timer.periodic(
         const Duration(milliseconds: 500),
-            (Timer timer) async {
+        (Timer timer) async {
           if (_isDisposed) {
             return;
           }
@@ -656,15 +659,17 @@ class VideoPlayerController extends ValueNotifier<VideoPlayerValue> {
       super.removeListener(listener);
     }
 
-    this.removeErrorListener();
+    removeErrorListener();
   }
 
-  void onErrorReceived(VideoErrorCallback videoErrorListener) {
-    this._videoErrorListener = videoErrorListener;
+  void onErrorReceived(VideoErrorCallback videoErrorListener,
+      {bool logVideoState = false}) {
+    _logVideoState = logVideoState;
+    _videoErrorListener = videoErrorListener;
   }
 
   void removeErrorListener() {
-    this._videoErrorListener = null;
+    _videoErrorListener = null;
   }
 
   bool get _isDisposedOrNotInitialized => _isDisposed || !value.isInitialized;
@@ -879,11 +884,11 @@ class VideoProgressIndicator extends StatefulWidget {
   /// provided. [allowScrubbing] defaults to false, and [padding] will default
   /// to `top: 5.0`.
   VideoProgressIndicator(
-      this.controller, {
-        this.colors = const VideoProgressColors(),
-        required this.allowScrubbing,
-        this.padding = const EdgeInsets.only(top: 5.0),
-      });
+    this.controller, {
+    this.colors = const VideoProgressColors(),
+    required this.allowScrubbing,
+    this.padding = const EdgeInsets.only(top: 5.0),
+  });
 
   /// The [VideoPlayerController] that actually associates a video with this
   /// widget.
