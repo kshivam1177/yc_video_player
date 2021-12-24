@@ -4,6 +4,6 @@
 
 package com.yc.video.player.yc_video_player;
 
-class YcVideoPlayerOptions {
+public class YcVideoPlayerOptions {
   public boolean mixWithOthers;
 }

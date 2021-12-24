@@ -13,14 +13,6 @@ import io.flutter.Log;
 import io.flutter.embedding.engine.plugins.FlutterPlugin;
 import io.flutter.plugin.common.BinaryMessenger;
 import io.flutter.plugin.common.EventChannel;
-import io.flutter.plugins.ycvideoplayer.YcMessages.CreateMessage;
-import io.flutter.plugins.ycvideoplayer.YcMessages.LoopingMessage;
-import io.flutter.plugins.ycvideoplayer.YcMessages.MixWithOthersMessage;
-import io.flutter.plugins.ycvideoplayer.YcMessages.PlaybackSpeedMessage;
-import io.flutter.plugins.ycvideoplayer.YcMessages.PositionMessage;
-import io.flutter.plugins.ycvideoplayer.YcMessages.TextureMessage;
-import io.flutter.plugins.ycvideoplayer.YcMessages.YcVideoPlayerApi;
-import io.flutter.plugins.ycvideoplayer.YcMessages.VolumeMessage;
 import io.flutter.view.TextureRegistry;
 
 import java.security.KeyManagementException;
@@ -29,7 +21,7 @@ import java.util.Map;
 
 import javax.net.ssl.HttpsURLConnection;
 
-public class YcVideoPlayerPlugin implements FlutterPlugin, YcVideoPlayerApi {
+public class YcVideoPlayerPlugin implements FlutterPlugin, YcMessages.YcVideoPlayerApi {
     private static final String TAG = "VideoPlayerPlugin";
     private final LongSparseArray<YcVideoPlayer> videoPlayers = new LongSparseArray<>();
     private FlutterState flutterState;
@@ -121,7 +113,7 @@ public class YcVideoPlayerPlugin implements FlutterPlugin, YcVideoPlayerApi {
         disposeAllPlayers();
     }
 
-    public TextureMessage create(CreateMessage arg) {
+    public YcMessages.TextureMessage create(YcMessages.CreateMessage arg) {
 
         TextureRegistry.SurfaceTextureEntry handle = flutterState.textureRegistry.createSurfaceTexture();
         EventChannel eventChannel = new EventChannel(flutterState.binaryMessenger,
@@ -164,57 +156,57 @@ public class YcVideoPlayerPlugin implements FlutterPlugin, YcVideoPlayerApi {
 
         videoPlayers.put(handle.id(), player);
 
-        TextureMessage result = new TextureMessage();
+        YcMessages.TextureMessage result = new YcMessages.TextureMessage();
         result.setTextureId(handle.id());
         return result;
     }
 
-    public void dispose(TextureMessage arg) {
+    public void dispose(YcMessages.TextureMessage arg) {
         YcVideoPlayer player = videoPlayers.get(arg.getTextureId());
         player.dispose();
         videoPlayers.remove(arg.getTextureId());
     }
 
-    public void setLooping(LoopingMessage arg) {
+    public void setLooping(YcMessages.LoopingMessage arg) {
         YcVideoPlayer player = videoPlayers.get(arg.getTextureId());
         player.setLooping(arg.getIsLooping());
     }
 
-    public void setVolume(VolumeMessage arg) {
+    public void setVolume(YcMessages.VolumeMessage arg) {
         YcVideoPlayer player = videoPlayers.get(arg.getTextureId());
         player.setVolume(arg.getVolume());
     }
 
-    public void setPlaybackSpeed(PlaybackSpeedMessage arg) {
+    public void setPlaybackSpeed(YcMessages.PlaybackSpeedMessage arg) {
         YcVideoPlayer player = videoPlayers.get(arg.getTextureId());
         player.setPlaybackSpeed(arg.getSpeed());
     }
 
-    public void play(TextureMessage arg) {
+    public void play(YcMessages.TextureMessage arg) {
         YcVideoPlayer player = videoPlayers.get(arg.getTextureId());
         player.play();
     }
 
-    public PositionMessage position(TextureMessage arg) {
+    public YcMessages.PositionMessage position(YcMessages.TextureMessage arg) {
         YcVideoPlayer player = videoPlayers.get(arg.getTextureId());
-        PositionMessage result = new PositionMessage();
+        YcMessages.PositionMessage result = new YcMessages.PositionMessage();
         result.setPosition(player.getPosition());
         player.sendBufferingUpdate();
         return result;
     }
 
-    public void seekTo(PositionMessage arg) {
+    public void seekTo(YcMessages.PositionMessage arg) {
         YcVideoPlayer player = videoPlayers.get(arg.getTextureId());
         player.seekTo(arg.getPosition().intValue());
     }
 
-    public void pause(TextureMessage arg) {
+    public void pause(YcMessages.TextureMessage arg) {
         YcVideoPlayer player = videoPlayers.get(arg.getTextureId());
         player.pause();
     }
 
     @Override
-    public void setMixWithOthers(MixWithOthersMessage arg) {
+    public void setMixWithOthers(YcMessages.MixWithOthersMessage arg) {
         options.mixWithOthers = arg.getMixWithOthers();
     }
 
@@ -248,11 +240,11 @@ public class YcVideoPlayerPlugin implements FlutterPlugin, YcVideoPlayerApi {
         }
 
         void startListening(YcVideoPlayerPlugin methodCallHandler, BinaryMessenger messenger) {
-            YcVideoPlayerApi.setup(messenger, methodCallHandler);
+            YcMessages.YcVideoPlayerApi.setup(messenger, methodCallHandler);
         }
 
         void stopListening(BinaryMessenger messenger) {
-            YcVideoPlayerApi.setup(messenger, null);
+            YcMessages.YcVideoPlayerApi.setup(messenger, null);
         }
     }
 }
