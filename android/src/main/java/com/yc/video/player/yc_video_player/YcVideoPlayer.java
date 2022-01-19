@@ -65,6 +65,13 @@ final class YcVideoPlayer {
 
     private final YcVideoPlayerOptions options;
 
+
+    private Context context;
+    private String dataSource;
+    private String formatHint;
+    private Map<String, String> httpHeaders;
+
+
     YcVideoPlayer(Context context,
                   EventChannel eventChannel,
                   TextureRegistry.SurfaceTextureEntry textureEntry,
@@ -73,14 +80,22 @@ final class YcVideoPlayer {
                   Map<String, String> httpHeaders,
                   YcVideoPlayerOptions options) {
 
+        this.context = context;
         this.eventChannel = eventChannel;
         this.textureEntry = textureEntry;
         this.options = options;
+        this.dataSource = dataSource;
+        this.formatHint = formatHint;
+        this.httpHeaders = httpHeaders;
 
-        exoPlayer = new SimpleExoPlayer.Builder(context).build();
-        
+        this.initExoPlayerInstance();
+    }
 
-        Uri uri = Uri.parse(dataSource);
+    private void initExoPlayerInstance() {
+
+        exoPlayer = new SimpleExoPlayer.Builder(this.context).build();
+
+        Uri uri = Uri.parse(this.dataSource);
 
         DataSource.Factory dataSourceFactory;
         if (isHTTP(uri)) {
@@ -237,6 +252,16 @@ final class YcVideoPlayer {
                     event.put("errorType", error.rendererName);
                     event.put("errorDetail", error.toString());
                     eventSink.success(event);
+
+                    Log.e("SHIVAM", "onPlayerError: DISPOSING...... ");
+
+                    YcVideoPlayer.this.softDispose();
+
+                    Log.e("SHIVAM", "onPlayerError: DISPOSED and calling initExoPlayerInstance...... ");
+
+                    YcVideoPlayer.this.initExoPlayerInstance();
+
+                    Log.e("SHIVAM", "onPlayerError: initExoPlayerInstance done...... ");
                 }
 
             }
@@ -325,6 +350,7 @@ final class YcVideoPlayer {
     }
 
     void dispose() {
+
         if (isInitialized) {
             exoPlayer.stop();
         }
@@ -332,6 +358,16 @@ final class YcVideoPlayer {
         eventChannel.setStreamHandler(null);
         if (surface != null) {
             surface.release();
+        }
+        if (exoPlayer != null) {
+            exoPlayer.release();
+        }
+    }
+
+
+    void softDispose() {
+        if (isInitialized) {
+            exoPlayer.stop();
         }
         if (exoPlayer != null) {
             exoPlayer.release();
