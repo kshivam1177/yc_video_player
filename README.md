@@ -58,7 +58,7 @@ The `VideoPlayerOptions.mixWithOthers` option can't be implemented in web, at le
 ## Example
 
 ```dart
-import 'package:video_player/video_player.dart';
+import 'package:yc_video_player/video_player.dart';
 import 'package:flutter/material.dart';
 
 void main() => runApp(VideoApp());
