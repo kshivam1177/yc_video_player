@@ -360,27 +360,26 @@ class VideoPlayerController extends ValueNotifier<VideoPlayerValue> {
     _creatingCompleter!.complete(null);
     final Completer<void> initializingCompleter = Completer<void>();
 
-    // void _videoErrorhandler(VideoEvent event) {
-    //   if (_videoErrorListener != null) {
-    //     if (event.eventType != VideoEventType.error) {
-    //       return;
-    //     }
-    //
-    //     // if (event.errorType == null) {
-    //     //   return;
-    //     // }
-    //
-    //     VideoErrorTypes errorTypes = VideoErrorTypes.OTHER;
-    //     if (event.errorType?.contains("MediaCodec") ?? false) {
-    //       errorTypes = VideoErrorTypes.MEDIA_CODEC_ERROR;
-    //     }
-    //
-    //     _videoErrorListener!(VideoPlayerError(
-    //       errorType: errorTypes,
-    //       errorDetail: event.errorDetail ?? "",
-    //     ));
-    //   }
-    // }
+    void _videoErrorhandler(VideoEvent event) {
+      if (_videoErrorListener != null) {
+        debugPrint(
+            "yc_player_state-> yha pr bhi mila -> ${event.eventType.name}");
+
+        if (event.eventType != VideoEventType.error) {
+          return;
+        }
+
+        VideoErrorTypes errorTypes = VideoErrorTypes.OTHER;
+        if (event.errorType?.contains("MediaCodec") ?? false) {
+          errorTypes = VideoErrorTypes.MEDIA_CODEC_ERROR;
+        }
+
+        _videoErrorListener!(VideoPlayerError(
+          errorType: errorTypes,
+          errorDetail: event.errorDetail ?? "",
+        ));
+      }
+    }
 
     void eventListener(VideoEvent event) {
       if (_isDisposed) {
@@ -421,21 +420,8 @@ class VideoPlayerController extends ValueNotifier<VideoPlayerValue> {
         case VideoEventType.unknown:
           break;
         case VideoEventType.error:
-          // _videoErrorhandler(event);
+          _videoErrorhandler(event);
 
-          if (_videoErrorListener != null) {
-            debugPrint(
-                "yc_player_state-> yha pr bhi mila -> ${event.eventType.name}");
-            VideoErrorTypes errorTypes = VideoErrorTypes.OTHER;
-            if (event.errorType?.contains("MediaCodec") ?? false) {
-              errorTypes = VideoErrorTypes.MEDIA_CODEC_ERROR;
-            }
-
-            _videoErrorListener!(VideoPlayerError(
-              errorType: errorTypes,
-              errorDetail: event.errorDetail ?? "",
-            ));
-          }
           break;
       }
     }
