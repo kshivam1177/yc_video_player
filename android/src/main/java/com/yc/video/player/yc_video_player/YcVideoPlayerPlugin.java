@@ -17,6 +17,7 @@ import io.flutter.view.TextureRegistry;
 
 import java.security.KeyManagementException;
 import java.security.NoSuchAlgorithmException;
+import java.util.List;
 import java.util.Map;
 
 import javax.net.ssl.HttpsURLConnection;
@@ -107,6 +108,13 @@ public class YcVideoPlayerPlugin implements FlutterPlugin, YcMessages.YcVideoPla
         // be replaced with just asserting that videoPlayers.isEmpty().
         // https://github.com/flutter/flutter/issues/20989 tracks this.
         disposeAllPlayers();
+    }
+
+    @Override
+    public void preload(YcMessages.PreloadMessage message) {
+
+        System.out.println("preload------------ " + message.getItems());
+
     }
 
     public void initialize() {

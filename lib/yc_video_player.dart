@@ -8,7 +8,6 @@ import 'dart:io';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
-import 'package:meta/meta.dart';
 import 'package:yc_video_player_platform_interface/video_player_platform_interface.dart';
 
 export 'package:yc_video_player_platform_interface/video_player_platform_interface.dart'
@@ -59,9 +58,10 @@ class VideoPlayerValue {
   /// Returns an instance with the given [errorDescription].
   VideoPlayerValue.erroneous(String errorDescription)
       : this(
-            duration: Duration.zero,
-            isInitialized: false,
-            errorDescription: errorDescription);
+          duration: Duration.zero,
+          isInitialized: false,
+          errorDescription: errorDescription,
+        );
 
   /// The total duration of the video.
   ///
@@ -187,7 +187,10 @@ class VideoPlayerError {
   final String errorDetail;
 }
 
-enum VideoErrorTypes { MEDIA_CODEC_ERROR, OTHER }
+enum VideoErrorTypes {
+  MEDIA_CODEC_ERROR,
+  OTHER,
+}
 
 /// Controls a platform video player, and provides updates when the state is
 /// changing.
@@ -209,9 +212,12 @@ class VideoPlayerController extends ValueNotifier<VideoPlayerValue> {
   VideoErrorCallback? _videoErrorListener;
   bool _logVideoState = false;
 
-  VideoPlayerController.asset(this.dataSource,
-      {this.package, this.closedCaptionFile, this.videoPlayerOptions})
-      : dataSourceType = DataSourceType.asset,
+  VideoPlayerController.asset(
+    this.dataSource, {
+    this.package,
+    this.closedCaptionFile,
+    this.videoPlayerOptions,
+  })  : dataSourceType = DataSourceType.asset,
         formatHint = null,
         httpHeaders = const {},
         super(VideoPlayerValue(duration: Duration.zero));
@@ -241,9 +247,11 @@ class VideoPlayerController extends ValueNotifier<VideoPlayerValue> {
   /// This will load the file from the file-URI given by:
   /// `'file://${file.path}'`.
 
-  VideoPlayerController.file(File file,
-      {this.closedCaptionFile, this.videoPlayerOptions})
-      : dataSource = 'file://${file.path}',
+  VideoPlayerController.file(
+    File file, {
+    this.closedCaptionFile,
+    this.videoPlayerOptions,
+  })  : dataSource = 'file://${file.path}',
         dataSourceType = DataSourceType.file,
         package = null,
         formatHint = null,
@@ -458,7 +466,7 @@ class VideoPlayerController extends ValueNotifier<VideoPlayerValue> {
       _lifeCycleObserver.dispose();
     }
     _isDisposed = true;
-    this.removeErrorListener();
+    removeErrorListener();
     super.dispose();
   }
 
@@ -709,7 +717,8 @@ class _VideoAppLifeCycleObserver extends Object with WidgetsBindingObserver {
 /// Widget that displays the video controlled by [controller].
 class VideoPlayer extends StatefulWidget {
   /// Uses the given [controller] for all video rendered in this widget.
-  VideoPlayer(this.controller);
+
+  const VideoPlayer(this.controller);
 
   /// The [VideoPlayerController] responsible for the video being rendered in
   /// this widget.

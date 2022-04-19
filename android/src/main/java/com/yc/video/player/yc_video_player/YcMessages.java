@@ -12,6 +12,7 @@ import io.flutter.plugin.common.BinaryMessenger;
 import io.flutter.plugin.common.StandardMessageCodec;
 
 import java.util.HashMap;
+import java.util.List;
 
 /**
  * Generated class from Pigeon.
@@ -309,6 +310,51 @@ public class YcMessages {
         }
     }
 
+
+    public static class PreloadMessage {
+        private Long textureId;
+
+        public Long getTextureId() {
+            return textureId;
+        }
+
+        public void setTextureId(Long setterArg) {
+            this.textureId = setterArg;
+        }
+
+        private List<String> items;
+
+        public List<String> getItems() {
+            return items;
+        }
+
+        public void setSpeed(List<String> setterArg) {
+            this.items = setterArg;
+        }
+
+        HashMap toMap() {
+            HashMap<String, Object> toMapResult = new HashMap<>();
+            toMapResult.put("textureId", textureId);
+            toMapResult.put("items", items);
+            return toMapResult;
+        }
+
+        static PreloadMessage fromMap(HashMap map) {
+            PreloadMessage fromMapResult = new PreloadMessage();
+            Object textureId = map.get("textureId");
+            fromMapResult.textureId =
+                    (textureId == null)
+                            ? null
+                            : ((textureId instanceof Integer) ? (Integer) textureId : (Long) textureId);
+            Object itemsObj = map.get("items");
+
+            System.out.println("------------" + itemsObj);
+
+            fromMapResult.items = (List<String>) itemsObj;
+            return fromMapResult;
+        }
+    }
+
     /**
      * Generated class from Pigeon that represents data sent in messages.
      */
@@ -341,6 +387,8 @@ public class YcMessages {
      * Generated interface from Pigeon that represents a handler of messages from Flutter.
      */
     public interface YcVideoPlayerApi {
+        void preload(PreloadMessage preloadMessage);
+
         void initialize();
 
         TextureMessage create(CreateMessage arg);
@@ -370,6 +418,35 @@ public class YcMessages {
             {
                 BasicMessageChannel<Object> channel = new BasicMessageChannel<>(
                         binaryMessenger,
+                        "dev.flutter.pigeon.VideoPlayerApi.preload",
+                        new StandardMessageCodec());
+
+                if (api != null) {
+
+                    channel.setMessageHandler((message, reply) -> {
+
+                        HashMap<String, HashMap> wrapped = new HashMap<>();
+                        try {
+
+                            PreloadMessage input = PreloadMessage.fromMap((HashMap) message);
+
+                            api.preload(input);
+
+                            wrapped.put("result", null);
+
+                        } catch (Exception exception) {
+                            wrapped.put("error", wrapError(exception));
+                        }
+                        reply.reply(wrapped);
+                    });
+                } else {
+                    channel.setMessageHandler(null);
+                }
+            }
+
+            {
+                BasicMessageChannel<Object> channel = new BasicMessageChannel<>(
+                        binaryMessenger,
                         "dev.flutter.pigeon.VideoPlayerApi.initialize",
                         new StandardMessageCodec());
 
@@ -388,6 +465,7 @@ public class YcMessages {
                     channel.setMessageHandler(null);
                 }
             }
+
             {
                 BasicMessageChannel<Object> channel = new BasicMessageChannel<>(
                         binaryMessenger,

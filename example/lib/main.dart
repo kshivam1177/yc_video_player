@@ -8,9 +8,6 @@
 /// video.
 
 import 'dart:convert';
-
-import 'package:flutter/cupertino.dart';
-import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:yc_video_player/yc_video_player.dart';
 
@@ -82,20 +79,22 @@ class _ButterFlyRemoteVideoInList extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return FutureBuilder<List<String>>(
-        initialData: [],
+        initialData: const <String>[],
         future: videoList(context),
         builder: (context, snapshot) {
           if (snapshot.data?.isNotEmpty ?? false) {
-            return GridView.builder(
+            return PageView.builder(
               itemCount: 100,
               itemBuilder: (itemBuilder, index) {
                 return _ExampleCard(remoteURL: snapshot.data?[index] ?? "");
               },
-              gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
-                  crossAxisCount: 2, childAspectRatio: 3 / 2),
+              // gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
+              //   crossAxisCount: 2,
+              //   childAspectRatio: 3 / 2,
+              // ),
             );
           } else {
-            return Center(child: CircularProgressIndicator());
+            return const Center(child: CircularProgressIndicator());
           }
         });
   }
@@ -118,7 +117,7 @@ class _ExampleCard extends StatelessWidget {
 class _ButterFlyAssetVideo extends StatefulWidget {
   final String remoteURL;
 
-  _ButterFlyAssetVideo(this.remoteURL);
+  const _ButterFlyAssetVideo(this.remoteURL);
 
   @override
   _ButterFlyAssetVideoState createState() => _ButterFlyAssetVideoState();
