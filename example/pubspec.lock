@@ -221,8 +221,8 @@ packages:
     dependency: transitive
     description:
       path: "."
-      ref: master
-      resolved-ref: "11dad40cfb927df527a3b7ae8dec5413052c1a8b"
+      ref: dev
+      resolved-ref: dda038e0c3fad0b0c67c6eca4a400b003cff2ef6
       url: "https://github.com/yellowclass/yc_player_platform_interface"
     source: git
     version: "5.0.0"
@@ -230,8 +230,8 @@ packages:
     dependency: transitive
     description:
       path: "."
-      ref: master
-      resolved-ref: da06773fe7b547ed3a0669e3b01b96aadc2410d6
+      ref: dev
+      resolved-ref: "4b4cfe9d3516e81edb713c38b85415b76f42f447"
       url: "https://github.com/yellowclass/yc_video_player_web"
     source: git
     version: "2.0.5"
