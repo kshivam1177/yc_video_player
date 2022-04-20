@@ -187,6 +187,7 @@ final class YcVideoPlayer {
         setAudioAttributes(exoPlayer, options.mixWithOthers);
         exoPlayer.addListener(new Listener() {
 
+
             private boolean isBuffering = false;
 
             public void setBuffering(boolean buffering) {
@@ -201,6 +202,10 @@ final class YcVideoPlayer {
                 }
             }
 
+            @Override
+            public void onIsLoadingChanged(boolean isLoading) {
+                Listener.super.onIsLoadingChanged(isLoading);
+            }
 
             @Override
             public void onPlaybackStateChanged(final int playbackState) {
@@ -237,6 +242,7 @@ final class YcVideoPlayer {
                     event.put("errorType", error.rendererName);
                     event.put("errorDetail", error.toString());
                     eventSink.success(event);
+                    exoPlayer.release();
                 }
 
             }

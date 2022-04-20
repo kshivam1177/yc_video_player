@@ -25,6 +25,10 @@ void main() {
 }
 
 class _App extends StatelessWidget {
+  String url_ =
+      // "https://video.yellowclass.com/_1202_v2_3dmoddeling_robot/hls_session/session_video.m3u8";
+      "https://dev-video.yellowclass.com/_CLASS/manish_maam_video_testing_sample/hls/video_288p.m3u8";
+
   @override
   Widget build(BuildContext context) {
     return DefaultTabController(
@@ -57,8 +61,7 @@ class _App extends StatelessWidget {
         ),
         body: TabBarView(
           children: <Widget>[
-            _ButterFlyAssetVideo(
-                "https://video.yellowclass.com/_1202_v2_3dmoddeling_robot/hls_session/session_video.m3u8"),
+            _ButterFlyAssetVideo(url_),
             _ButterFlyRemoteVideoInList(),
           ],
         ),
@@ -168,7 +171,7 @@ class _ButterFlyAssetVideoState extends State<_ButterFlyAssetVideo> {
               child: Stack(
                 alignment: Alignment.bottomCenter,
                 children: <Widget>[
-                  VideoPlayer(_controller),
+                  //VideoPlayer(_controller),
                   _ControlsOverlay(controller: _controller),
                   // VideoProgressIndicator(_controller, allowScrubbing: true),
                 ],
