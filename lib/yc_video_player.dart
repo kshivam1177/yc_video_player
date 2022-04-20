@@ -187,7 +187,7 @@ class VideoPlayerError {
   final String errorDetail;
 }
 
-enum VideoErrorTypes { MEDIA_CODEC_ERROR, OTHER }
+enum VideoErrorTypes { MEDIA_CODEC_ERROR, SOURCE_ERROR, OTHER }
 
 /// Controls a platform video player, and provides updates when the state is
 /// changing.
@@ -362,15 +362,15 @@ class VideoPlayerController extends ValueNotifier<VideoPlayerValue> {
 
     void _videoErrorhandler(VideoEvent event) {
       if (_videoErrorListener != null) {
+        debugPrint(
+            "yc_player_state-> yha pr bhi mila -> ${event.eventType.name}");
+
         if (event.eventType != VideoEventType.error) {
-          return;
-        }
-        if (event.errorType == null) {
           return;
         }
 
         VideoErrorTypes errorTypes = VideoErrorTypes.OTHER;
-        if (event.errorType!.contains("MediaCodec")) {
+        if (event.errorType?.contains("MediaCodec") ?? false) {
           errorTypes = VideoErrorTypes.MEDIA_CODEC_ERROR;
         }
 
@@ -421,6 +421,7 @@ class VideoPlayerController extends ValueNotifier<VideoPlayerValue> {
           break;
         case VideoEventType.error:
           _videoErrorhandler(event);
+
           break;
       }
     }
@@ -458,7 +459,7 @@ class VideoPlayerController extends ValueNotifier<VideoPlayerValue> {
       _lifeCycleObserver.dispose();
     }
     _isDisposed = true;
-    this.removeErrorListener();
+    removeErrorListener();
     super.dispose();
   }
 
@@ -659,7 +660,7 @@ class VideoPlayerController extends ValueNotifier<VideoPlayerValue> {
       super.removeListener(listener);
     }
 
-    removeErrorListener();
+    //removeErrorListener();
   }
 
   void onErrorReceived(VideoErrorCallback videoErrorListener,
