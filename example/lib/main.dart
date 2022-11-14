@@ -9,8 +9,6 @@
 
 import 'dart:convert';
 
-import 'package:flutter/cupertino.dart';
-import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:yc_video_player/yc_video_player.dart';
 
@@ -26,7 +24,15 @@ void main() {
   // };
 }
 
-class _App extends StatelessWidget {
+class _App extends StatefulWidget {
+  @override
+  State<_App> createState() => _AppState();
+}
+
+class _AppState extends State<_App> {
+  bool isFirst = false;
+  String _text = "";
+
   @override
   Widget build(BuildContext context) {
     return DefaultTabController(
@@ -38,28 +44,45 @@ class _App extends StatelessWidget {
           actions: <Widget>[
             IconButton(
               key: const ValueKey<String>('push_tab'),
-              icon: const Icon(Icons.navigation),
+              icon: const Icon(Icons.rotate_left),
               onPressed: () {
-                Navigator.push<_PlayerVideoAndPopPage>(
-                  context,
-                  MaterialPageRoute<_PlayerVideoAndPopPage>(
-                    builder: (BuildContext context) => _PlayerVideoAndPopPage(),
-                  ),
-                );
+                isFirst = !isFirst;
+                _text = isFirst ? "First" : "Second";
+
+                setState(() {});
+
+                // Navigator.push<_PlayerVideoAndPopPage>(
+                //   context,
+                //   MaterialPageRoute<_PlayerVideoAndPopPage>(
+                //     builder: (BuildContext context) => _PlayerVideoAndPopPage(),
+                //   ),
+                // );
               },
             )
           ],
-          bottom: const TabBar(
+          bottom: TabBar(
             isScrollable: true,
             tabs: <Widget>[
-              Tab(icon: Icon(Icons.insert_drive_file), text: "Asset"),
-              Tab(icon: Icon(Icons.list), text: "List example"),
+              Tab(
+                icon: const Icon(Icons.insert_drive_file),
+                text: _text,
+              ),
+              const Tab(
+                icon: Icon(Icons.list),
+                text: "List example",
+              ),
             ],
           ),
         ),
         body: TabBarView(
           children: <Widget>[
-            _ButterFlyAssetVideo(""),
+            isFirst
+                ? _ButterFlyAssetVideo(
+                    "https://dev-video.yellowclass.com/_CLASS/manish_maam_video_testing_sample/hls/video_288p.m3u8",
+                  )
+                : _ButterFlyAssetVideo(
+                    "https://dev-video.yellowclass.com/CLASS/manish_maam_video_testing_sample/hls/video_288p.m3u8",
+                  ),
             _ButterFlyRemoteVideoInList(),
           ],
         ),
@@ -91,11 +114,11 @@ class _ButterFlyRemoteVideoInList extends StatelessWidget {
               itemBuilder: (itemBuilder, index) {
                 return _ExampleCard(remoteURL: snapshot.data?[index] ?? "");
               },
-              gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
+              gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
                   crossAxisCount: 2, childAspectRatio: 3 / 2),
             );
           } else {
-            return Center(child: CircularProgressIndicator());
+            return const Center(child: CircularProgressIndicator());
           }
         });
   }
@@ -134,6 +157,12 @@ class _ButterFlyAssetVideoState extends State<_ButterFlyAssetVideo> {
         ? VideoPlayerController.asset('assets/Butterfly-209.mp4')
         : VideoPlayerController.network(widget.remoteURL);
 
+    _controller.onErrorReceived((videoPlayerError) {
+      debugPrint("\n\n  -----onErrorReceived ----- "
+          "\n-> ${videoPlayerError.errorType.name} "
+          "\n-> ${videoPlayerError.errorDetail} \n\n");
+    }, logVideoState: true);
+
     _controller.addListener(() {
       // setState(() {});
       // print("receiveBroadcastStream-listner->")
@@ -141,12 +170,6 @@ class _ButterFlyAssetVideoState extends State<_ButterFlyAssetVideo> {
     _controller.setLooping(true);
     _controller.initialize().then((_) => setState(() {}));
     _controller.play();
-
-    _controller.onErrorReceived((videoPlayerError) {
-      debugPrint("\n\n  onErrorReceived"
-          "-> ${videoPlayerError.errorType.name} "
-          "-> ${videoPlayerError.errorDetail} \n\n");
-    });
   }
 
   @override
@@ -204,13 +227,13 @@ class _ControlsOverlay extends StatelessWidget {
     return Stack(
       children: <Widget>[
         AnimatedSwitcher(
-          duration: Duration(milliseconds: 50),
-          reverseDuration: Duration(milliseconds: 200),
+          duration: const Duration(milliseconds: 50),
+          reverseDuration: const Duration(milliseconds: 200),
           child: controller.value.isPlaying
-              ? SizedBox.shrink()
+              ? const SizedBox.shrink()
               : Container(
                   color: Colors.black26,
-                  child: Center(
+                  child: const Center(
                     child: Icon(
                       Icons.play_arrow,
                       color: Colors.white,
